@@ -28,7 +28,7 @@ bool MyComm::openport(char *port)
 
 //设置DCB,先获取DCB配置，再设置，最后看是否设置好
 //输入：波特率rate_arg
-bool MyComm::setupdcb(int rate_arg, int parity)
+bool MyComm::setupdcb(DWORD rate_arg, BYTE parity, BYTE stopbit, BYTE bytesize)
 {
 	DCB  dcb;//声明设备控制块结构
 	int rate= rate_arg;
@@ -41,10 +41,10 @@ bool MyComm::setupdcb(int rate_arg, int parity)
 	dcb.DCBlength=sizeof(dcb);                //DCB结构体大小
 	/* ---------- Serial Port Config ------- */
     dcb.BaudRate        = rate;               //波特率
-	dcb.fParity         = 0;                  //是否进行奇偶校验
+	dcb.fParity         = 1;                  //是否进行奇偶校验
     dcb.Parity          = parity;           //奇偶校验 值0~4分别对应无校验、奇校验、偶校验、校验置位、校验清零
-    dcb.StopBits        = ONESTOPBIT;         //停止位数
-    dcb.ByteSize        = 8;                  //数据宽度，一般为8，有时候为7
+    dcb.StopBits        = stopbit;         //停止位数 0~2分别对应1位、1.5位、2位停止位
+    dcb.ByteSize        = bytesize;                  //数据宽度，一般为8，有时候为7
     dcb.fOutxCtsFlow    = 0;                  //CTS线上的硬件握手
     dcb.fOutxDsrFlow    = 0;                  //DSR线上的硬件握手
     dcb.fDtrControl     = DTR_CONTROL_DISABLE;//DTR控制
@@ -66,10 +66,12 @@ bool MyComm::setupdcb(int rate_arg, int parity)
     // set DCB
     if(!SetCommState(hComm,&dcb))
 	{
+		testflag = 4;//==
         return false;
 	}
     else
 	{
+		testflag = 4;//==
         return true;
 	}
 }
@@ -260,10 +262,13 @@ char * MyComm::AutoReadport()
 }
 
 //自动初始化
-bool MyComm::AutoInit(int m_portRate, int m_parity)
+/*bool MyComm::AutoInit(int m_portRate,  //波特率
+					  int m_parity,    //奇偶校验
+					  int m_stopbit,   //停止位
+					  int m_bytesize)  //数据位
 {
 	if(openport(AutoReadport())
-		||setupdcb(m_portRate, m_parity)
+		||setupdcb(m_portRate, m_parity, m_stopbit, m_bytesize)
 		||setuptimeout(0,0,0,0,0))
 	{
 		return true;
@@ -272,7 +277,7 @@ bool MyComm::AutoInit(int m_portRate, int m_parity)
 	{
 		return false;
 	}
-}
+}*/
 
 //测试示例
 /*
@@ -289,7 +294,7 @@ void MyComm::MyCommTsetExample()
 		//PURGE_RXABORT   中断所有读操作并立即返回，即使读操作还没有完成。
 		//PURGE_TXCLEAR   清除输出缓冲区
 		//PURGE_RXCLEAR   清除输入缓冲区
-	WriteChar("please send data now",20);
+	WriteChar((unsigned char*)"please send data now",20);
 	cout<<"received data:"<<endl;
 	ReceiveChar();
 }

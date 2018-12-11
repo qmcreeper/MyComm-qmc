@@ -29,12 +29,14 @@ public:
 	DWORD   m_dwCommEvents;
 	CString data;
 	bool openport(char *);//打开串口
-	bool setupdcb(int, int);//设置DCB
+	bool setupdcb(DWORD rate_arg, BYTE parity, BYTE stopbit, BYTE bytesizet);//设置DCB
 	bool setuptimeout(DWORD ,DWORD ,DWORD ,DWORD ,DWORD);//设置超时限制
 	bool WriteChar(BYTE * ,DWORD);//写入数据
 	bool ReceiveChar();//接收数据
 	char * AutoReadport();//自动读取串口号
-	bool AutoInit(int, int);
+	bool AutoInit(int, int, int, int);
+public:
+	int testflag;
 	//oid MyCommTsetExample();
 	/*
 	GetCommState               检测串口设置
