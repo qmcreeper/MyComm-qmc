@@ -1,4 +1,11 @@
-
+/***************************************************************
+*
+* 串口操作参考https://blog.csdn.net/lihongnuo/article/details/51842080
+* CString参考https://blog.csdn.net/liang841451955/article/details/80678487
+* 个人学习使用
+* 基于win32api,mfc用
+*
+***************************************************************/
 #ifndef _MYCOMM_H_
 #define _MYCOMM_H_
 
@@ -22,12 +29,12 @@ public:
 	DWORD   m_dwCommEvents;
 	CString data;
 	bool openport(char *);//打开串口
-	bool setupdcb(int);//设置DCB
+	bool setupdcb(int, int);//设置DCB
 	bool setuptimeout(DWORD ,DWORD ,DWORD ,DWORD ,DWORD);//设置超时限制
 	bool WriteChar(BYTE * ,DWORD);//写入数据
 	bool ReceiveChar();//接收数据
-	UCHAR AutoReadport();//自动读取串口号
-	bool AutoInit();
+	char * AutoReadport();//自动读取串口号
+	bool AutoInit(int, int);
 	//oid MyCommTsetExample();
 	/*
 	GetCommState               检测串口设置

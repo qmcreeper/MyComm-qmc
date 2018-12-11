@@ -28,7 +28,7 @@ bool MyComm::openport(char *port)
 
 //设置DCB,先获取DCB配置，再设置，最后看是否设置好
 //输入：波特率rate_arg
-bool MyComm::setupdcb(int rate_arg)
+bool MyComm::setupdcb(int rate_arg, int parity)
 {
 	DCB  dcb;//声明设备控制块结构
 	int rate= rate_arg;
@@ -42,7 +42,7 @@ bool MyComm::setupdcb(int rate_arg)
 	/* ---------- Serial Port Config ------- */
     dcb.BaudRate        = rate;               //波特率
 	dcb.fParity         = 0;                  //是否进行奇偶校验
-    dcb.Parity          = NOPARITY;           //奇偶校验 值0~4分别对应无校验、奇校验、偶校验、校验置位、校验清零
+    dcb.Parity          = parity;           //奇偶校验 值0~4分别对应无校验、奇校验、偶校验、校验置位、校验清零
     dcb.StopBits        = ONESTOPBIT;         //停止位数
     dcb.ByteSize        = 8;                  //数据宽度，一般为8，有时候为7
     dcb.fOutxCtsFlow    = 0;                  //CTS线上的硬件握手
@@ -216,7 +216,7 @@ bool MyComm::WriteChar(BYTE * m_szWriteBuffer,DWORD m_nToSend)
 	return true;
 }
 
-UCHAR MyComm::AutoReadport()
+char * MyComm::AutoReadport()
 {
 	int i = 0;
 	CHAR Name[25]; 
@@ -227,7 +227,7 @@ UCHAR MyComm::AutoReadport()
 	DWORD dwSizeofPortName; 
 	DWORD Type;
 	HKEY hKey; 
-	CString strSerialList[256];  // 临时定义 256 个字符串组，因为系统最多也就 256 个 
+	CString strSerialList[256];  // 临时定义 256 个字符串组，因为系统最多也就 256 个
 	LPCTSTR data_Set="HARDWARE\\DEVICEMAP\\SERIALCOMM\\";
 	dwName = sizeof(Name); 
 	dwSizeofPortName = sizeof(szPortName);
@@ -243,6 +243,7 @@ UCHAR MyComm::AutoReadport()
 				strSerialList[i] = CString(szPortName);       // 串口字符串保存 
 				printf("serial:%s\n",strSerialList[i]);
 				i++;// 串口计数 
+				//--可能出现多个串口，后面会修改
 			} 
 			//每读取一次dwName和dwSizeofPortName都会被修改 			//注意一定要重置,否则会出现很离奇的错误,本人就试过因没有重置,出现先插入串口号大的（如COM4）,再插入串口号小的（如COM3），此时虽能发现两个串口，但都是同一串口号（COM4）的问题，同时也读不了COM大于10以上的串口 
 			dwName = sizeof(Name); 
@@ -250,14 +251,20 @@ UCHAR MyComm::AutoReadport()
 		} while((Status == ERROR_SUCCESS)||(Status == ERROR_MORE_DATA)); 
  
 		 //RegCloseKey(hKey);
-		return szPortName;
+		if(strSerialList[0])
+		{
+			return ((LPSTR)(LPCSTR)strSerialList[0]);
+		}
 	}
+	return 0;
 }
 
 //自动初始化
-bool MyComm::AutoInit()
+bool MyComm::AutoInit(int m_portRate, int m_parity)
 {
-	if(openport(AutoReadport()))
+	if(openport(AutoReadport())
+		||setupdcb(m_portRate, m_parity)
+		||setuptimeout(0,0,0,0,0))
 	{
 		return true;
 	}
@@ -266,6 +273,7 @@ bool MyComm::AutoInit()
 		return false;
 	}
 }
+
 //测试示例
 /*
 void MyComm::MyCommTsetExample()
