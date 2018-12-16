@@ -4,20 +4,20 @@
 
 
 ///////////////////////////////////////
-//´ò¿ª´®¿Ú
+//æ‰“å¼€ä¸²å£
 bool MyComm::openport(char *port)
 {
 	HANDLE hComm;
-	hComm = CreateFile(port, //´®¿ÚºÅ
-                       GENERIC_READ | GENERIC_WRITE, //ÔÊĞí¶ÁĞ´
-                       0, //Í¨Ñ¶Éè±¸±ØĞëÒÔ¶ÀÕ¼·½Ê½´ò¿ª
-                       0, //ÎŞ°²È«ÊôĞÔ
-                       OPEN_EXISTING, //Í¨Ñ¶Éè±¸ÒÑ´æÔÚ
-                       FILE_FLAG_OVERLAPPED,//Òì²½I/O£¬Í¬²½¸ÄÎª0
-                       0); //Í¨Ñ¶Éè±¸²»ÄÜÓÃÄ£°å´ò¿ª
-	if (hComm == INVALID_HANDLE_VALUE)//INVALID_HANDLE_VALUE±íÊ¾ÎŞĞ§µÄ¾ä±úÖµ 
+	hComm = CreateFile(port, //ä¸²å£å·
+                       GENERIC_READ | GENERIC_WRITE, //å…è®¸è¯»å†™
+                       0, //é€šè®¯è®¾å¤‡å¿…é¡»ä»¥ç‹¬å æ–¹å¼æ‰“å¼€
+                       0, //æ— å®‰å…¨å±æ€§
+                       OPEN_EXISTING, //é€šè®¯è®¾å¤‡å·²å­˜åœ¨
+                       FILE_FLAG_OVERLAPPED,//å¼‚æ­¥I/Oï¼ŒåŒæ­¥æ”¹ä¸º0
+                       0); //é€šè®¯è®¾å¤‡ä¸èƒ½ç”¨æ¨¡æ¿æ‰“å¼€
+	if (hComm == INVALID_HANDLE_VALUE)//INVALID_HANDLE_VALUEè¡¨ç¤ºæ— æ•ˆçš„å¥æŸ„å€¼ 
 	{
-		CloseHandle(hComm);//¾ä±úÎŞĞ§Ê±¹Ø±Õ
+		CloseHandle(hComm);//å¥æŸ„æ— æ•ˆæ—¶å…³é—­
 		return false;
 	}
 	else
@@ -26,42 +26,42 @@ bool MyComm::openport(char *port)
 	}
 }
 
-//ÉèÖÃDCB,ÏÈ»ñÈ¡DCBÅäÖÃ£¬ÔÙÉèÖÃ£¬×îºó¿´ÊÇ·ñÉèÖÃºÃ
-//ÊäÈë£º²¨ÌØÂÊrate_arg
+//è®¾ç½®DCB,å…ˆè·å–DCBé…ç½®ï¼Œå†è®¾ç½®ï¼Œæœ€åçœ‹æ˜¯å¦è®¾ç½®å¥½
+//è¾“å…¥ï¼šæ³¢ç‰¹ç‡rate_arg
 bool MyComm::setupdcb(DWORD rate_arg, BYTE parity, BYTE stopbit, BYTE bytesize)
 {
-	DCB  dcb;//ÉùÃ÷Éè±¸¿ØÖÆ¿é½á¹¹
+	DCB  dcb;//å£°æ˜è®¾å¤‡æ§åˆ¶å—ç»“æ„
 	int rate= rate_arg;
-	memset(&dcb,0,sizeof(dcb));//ÔÚÒ»¶ÎÄÚ´æ¿éÖĞÌî³äÄ³¸ö¸ø¶¨µÄÖµ£¬ÊÇ¶Ô½Ï´óµÄ½á¹¹Ìå»òÊı×é½øĞĞÇåÁã²Ù×÷µÄÒ»ÖÖ×î¿ì·½·¨
-	if(!GetCommState(hComm,&dcb))//»ñÈ¡µ±Ç°DCBÅäÖÃ
+	memset(&dcb,0,sizeof(dcb));//åœ¨ä¸€æ®µå†…å­˜å—ä¸­å¡«å……æŸä¸ªç»™å®šçš„å€¼ï¼Œæ˜¯å¯¹è¾ƒå¤§çš„ç»“æ„ä½“æˆ–æ•°ç»„è¿›è¡Œæ¸…é›¶æ“ä½œçš„ä¸€ç§æœ€å¿«æ–¹æ³•
+	if(!GetCommState(hComm,&dcb))//è·å–å½“å‰DCBé…ç½®
 	{
 		return FALSE;
 	}
 	// set DCB to configure the serial port
-	dcb.DCBlength=sizeof(dcb);                //DCB½á¹¹Ìå´óĞ¡
+	dcb.DCBlength=sizeof(dcb);                //DCBç»“æ„ä½“å¤§å°
 	/* ---------- Serial Port Config ------- */
-    dcb.BaudRate        = rate;               //²¨ÌØÂÊ
-	dcb.fParity         = 1;                  //ÊÇ·ñ½øĞĞÆæÅ¼Ğ£Ñé
-    dcb.Parity          = parity;           //ÆæÅ¼Ğ£Ñé Öµ0~4·Ö±ğ¶ÔÓ¦ÎŞĞ£Ñé¡¢ÆæĞ£Ñé¡¢Å¼Ğ£Ñé¡¢Ğ£ÑéÖÃÎ»¡¢Ğ£ÑéÇåÁã
-    dcb.StopBits        = stopbit;         //Í£Ö¹Î»Êı 0~2·Ö±ğ¶ÔÓ¦1Î»¡¢1.5Î»¡¢2Î»Í£Ö¹Î»
-    dcb.ByteSize        = bytesize;                  //Êı¾İ¿í¶È£¬Ò»°ãÎª8£¬ÓĞÊ±ºòÎª7
-    dcb.fOutxCtsFlow    = 0;                  //CTSÏßÉÏµÄÓ²¼şÎÕÊÖ
-    dcb.fOutxDsrFlow    = 0;                  //DSRÏßÉÏµÄÓ²¼şÎÕÊÖ
-    dcb.fDtrControl     = DTR_CONTROL_DISABLE;//DTR¿ØÖÆ
+        dcb.BaudRate        = rate;               //æ³¢ç‰¹ç‡
+	dcb.fParity         = 1;                  //æ˜¯å¦è¿›è¡Œå¥‡å¶æ ¡éªŒ
+    dcb.Parity          = parity;           //å¥‡å¶æ ¡éªŒ å€¼0~4åˆ†åˆ«å¯¹åº”æ— æ ¡éªŒã€å¥‡æ ¡éªŒã€å¶æ ¡éªŒã€æ ¡éªŒç½®ä½ã€æ ¡éªŒæ¸…é›¶
+    dcb.StopBits        = stopbit;         //åœæ­¢ä½æ•° 0~2åˆ†åˆ«å¯¹åº”1ä½ã€1.5ä½ã€2ä½åœæ­¢ä½
+    dcb.ByteSize        = bytesize;                  //æ•°æ®å®½åº¦ï¼Œä¸€èˆ¬ä¸º8ï¼Œæœ‰æ—¶å€™ä¸º7
+    dcb.fOutxCtsFlow    = 0;                  //CTSçº¿ä¸Šçš„ç¡¬ä»¶æ¡æ‰‹
+    dcb.fOutxDsrFlow    = 0;                  //DSRçº¿ä¸Šçš„ç¡¬ä»¶æ¡æ‰‹
+    dcb.fDtrControl     = DTR_CONTROL_DISABLE;//DTRæ§åˆ¶
     dcb.fDsrSensitivity =0;                   //DSR sensitivity
     dcb.fRtsControl     = RTS_CONTROL_DISABLE;
-    dcb.fOutX           = 0;                  //ÊÇ·ñÊ¹ÓÃXON/XOFFĞ­Òé
-    dcb.fInX            = 0;                  //ÊÇ·ñÊ¹ÓÃXON/XOFFĞ­Òé
+    dcb.fOutX           = 0;                  //æ˜¯å¦ä½¿ç”¨XON/XOFFåè®®
+    dcb.fInX            = 0;                  //æ˜¯å¦ä½¿ç”¨XON/XOFFåè®®
 	/* --------------- misc parameters ----- */
     dcb.fErrorChar      = 0;
-    dcb.fBinary         = 1;                  //ÊÇ·ñÊÇ¶ş½øÖÆ£¬Ò»°ãÉèÖÃÎªTRUE
+    dcb.fBinary         = 1;                  //æ˜¯å¦æ˜¯äºŒè¿›åˆ¶ï¼Œä¸€èˆ¬è®¾ç½®ä¸ºTRUE
     dcb.fNull           = 0; 
     dcb.fAbortOnError   = 0;
     dcb.wReserved       = 0;
-    dcb.XonLim          = 2;                  //ÉèÖÃÔÚXON×Ö·û·¢ËÍÖ®Ç°inbufÖĞÔÊĞíµÄ×îÉÙ×Ö½ÚÊı
-    dcb.XoffLim         = 4;                  //ÔÚ·¢ËÍXOFF×Ö·ûÖ®Ç°outbufÖĞÔÊĞíµÄ×î¶à×Ö½ÚÊı
-    dcb.XonChar         = 0x13;               //ÉèÖÃ±íÊ¾XON×Ö·ûµÄ×Ö·û,Ò»°ãÊÇ²ÉÓÃ0x11Õâ¸öÊıÖµ            
-    dcb.XoffChar        = 0x19;               //ÉèÖÃ±íÊ¾XOFF×Ö·ûµÄ×Ö·û,Ò»°ãÊÇ²ÉÓÃ0x13Õâ¸öÊıÖµ
+    dcb.XonLim          = 2;                  //è®¾ç½®åœ¨XONå­—ç¬¦å‘é€ä¹‹å‰inbufä¸­å…è®¸çš„æœ€å°‘å­—èŠ‚æ•°
+    dcb.XoffLim         = 4;                  //åœ¨å‘é€XOFFå­—ç¬¦ä¹‹å‰outbufä¸­å…è®¸çš„æœ€å¤šå­—èŠ‚æ•°
+    dcb.XonChar         = 0x13;               //è®¾ç½®è¡¨ç¤ºXONå­—ç¬¦çš„å­—ç¬¦,ä¸€èˆ¬æ˜¯é‡‡ç”¨0x11è¿™ä¸ªæ•°å€¼            
+    dcb.XoffChar        = 0x19;               //è®¾ç½®è¡¨ç¤ºXOFFå­—ç¬¦çš„å­—ç¬¦,ä¸€èˆ¬æ˜¯é‡‡ç”¨0x13è¿™ä¸ªæ•°å€¼
     dcb.EvtChar         = 0;
     // set DCB
     if(!SetCommState(hComm,&dcb))
@@ -77,15 +77,15 @@ bool MyComm::setupdcb(DWORD rate_arg, BYTE parity, BYTE stopbit, BYTE bytesize)
 }
 
  
-//ÉèÖÃ³¬Ê±ÏŞÖÆ£¬±ÜÃâ×èÈûÏÖÏó
+//è®¾ç½®è¶…æ—¶é™åˆ¶ï¼Œé¿å…é˜»å¡ç°è±¡
 bool MyComm::setuptimeout(DWORD ReadInterval,DWORD ReadTotalMultiplier,
 						  DWORD ReadTotalconstant,DWORD WriteTotalMultiplier,
 						  DWORD WriteTotalconstant)
 {
     COMMTIMEOUTS timeouts;
-    timeouts.ReadIntervalTimeout=ReadInterval;                //ÒÔºÁÃëÎªµ¥Î»Ö¸¶¨Í¨ĞÅÏßÉÏÁ½¸ö×Ö·ûµ½´ïÖ®¼äµÄ×î´óÊ±¼ä
-    timeouts.ReadTotalTimeoutConstant=ReadTotalconstant;      //ÒÔºÁÃëÎªµ¥Î»Ö¸¶¨Ò»¸ö³ËÊı£¬¸Ã³ËÊıÓÃÀ´¼ÆËã¶Á²Ù×÷µÄ×ÜÏŞÊ±Ê±¼ä
-    timeouts.ReadTotalTimeoutMultiplier=ReadTotalMultiplier;  //ÒÔºÁÃëÎªµ¥Î»Ö¸¶¨Ò»¸ö³£Êı£¬ÓÃÓÚ¼ÆËã¶Á²Ù×÷µÄ×ÜÏŞÊ±Ê±¼ä
+    timeouts.ReadIntervalTimeout=ReadInterval;                //ä»¥æ¯«ç§’ä¸ºå•ä½æŒ‡å®šé€šä¿¡çº¿ä¸Šä¸¤ä¸ªå­—ç¬¦åˆ°è¾¾ä¹‹é—´çš„æœ€å¤§æ—¶é—´
+    timeouts.ReadTotalTimeoutConstant=ReadTotalconstant;      //ä»¥æ¯«ç§’ä¸ºå•ä½æŒ‡å®šä¸€ä¸ªä¹˜æ•°ï¼Œè¯¥ä¹˜æ•°ç”¨æ¥è®¡ç®—è¯»æ“ä½œçš„æ€»é™æ—¶æ—¶é—´
+    timeouts.ReadTotalTimeoutMultiplier=ReadTotalMultiplier;  //ä»¥æ¯«ç§’ä¸ºå•ä½æŒ‡å®šä¸€ä¸ªå¸¸æ•°ï¼Œç”¨äºè®¡ç®—è¯»æ“ä½œçš„æ€»é™æ—¶æ—¶é—´
     timeouts.WriteTotalTimeoutConstant=WriteTotalconstant;
     timeouts.WriteTotalTimeoutMultiplier=WriteTotalMultiplier;
     if(!SetCommTimeouts(hComm, &timeouts))
@@ -99,7 +99,7 @@ bool MyComm::setuptimeout(DWORD ReadInterval,DWORD ReadTotalMultiplier,
 }
 
 
-//½ÓÊÕÊı¾İ
+//æ¥æ”¶æ•°æ®
 bool MyComm::ReceiveChar()
 {
 	data.Empty();
@@ -112,21 +112,21 @@ bool MyComm::ReceiveChar()
 
 	for (;;)
 	{
-		bResult= ClearCommError(hComm, &dwError, &comstat);// ÔÚÊ¹ÓÃReadFileº¯Êı½øĞĞ¶Á²Ù×÷Ç°£¬Ó¦ÏÈÊ¹ÓÃClearCommErrorº¯ÊıÇå³ı´íÎó
-        if (comstat.cbInQue ==0)// COMSTAT½á¹¹·µ»Ø´®¿Ú×´Ì¬ĞÅÏ¢
-			//Ö»ÓÃµ½ÁËcbInQue³ÉÔ±±äÁ¿£¬¸Ã³ÉÔ±±äÁ¿µÄÖµ´ú±íÊäÈë»º³åÇøµÄ×Ö½ÚÊı
+		bResult= ClearCommError(hComm, &dwError, &comstat);// åœ¨ä½¿ç”¨ReadFileå‡½æ•°è¿›è¡Œè¯»æ“ä½œå‰ï¼Œåº”å…ˆä½¿ç”¨ClearCommErrorå‡½æ•°æ¸…é™¤é”™è¯¯
+        if (comstat.cbInQue ==0)// COMSTATç»“æ„è¿”å›ä¸²å£çŠ¶æ€ä¿¡æ¯
+			//åªç”¨åˆ°äº†cbInQueæˆå‘˜å˜é‡ï¼Œè¯¥æˆå‘˜å˜é‡çš„å€¼ä»£è¡¨è¾“å…¥ç¼“å†²åŒºçš„å­—èŠ‚æ•°
             continue;
         if (bRead)
         {
-			bResult = ReadFile( hComm,      // Handle to COMM port´®¿ÚµÄ¾ä±ú
-							    &RXBuff,    //RX Buffer Pointer¶ÁÈëµÄÊı¾İ´æ´¢µÄµØÖ·£¬¼´¶ÁÈëµÄÊı¾İ½«´æ´¢ÔÚÒÔ¸ÃÖ¸ÕëµÄÖµÎªÊ×µØÖ·µÄÒ»Æ¬ÄÚ´æÇø
-								1,          //Read one byteÒª¶ÁÈëµÄÊı¾İµÄ×Ö½ÚÊı,
-								&BytesRead, // Stores number of bytes read,Ö¸ÏòÒ»¸öDWORDÊıÖµ£¬¸ÃÊıÖµ·µ»Ø¶Á²Ù×÷Êµ¼Ê¶ÁÈëµÄ×Ö½ÚÊı
-								&m_ov);     //pointer to the m_ov structureÖØµş²Ù×÷Ê±£¬¸Ã²ÎÊıÖ¸ÏòÒ»¸öOVERLAPPED½á¹¹£¬Í¬²½²Ù×÷Ê±£¬¸Ã²ÎÊıÎªNULL
+			bResult = ReadFile( hComm,      // Handle to COMM portä¸²å£çš„å¥æŸ„
+							    &RXBuff,    //RX Buffer Pointerè¯»å…¥çš„æ•°æ®å­˜å‚¨çš„åœ°å€ï¼Œå³è¯»å…¥çš„æ•°æ®å°†å­˜å‚¨åœ¨ä»¥è¯¥æŒ‡é’ˆçš„å€¼ä¸ºé¦–åœ°å€çš„ä¸€ç‰‡å†…å­˜åŒº
+								1,          //Read one byteè¦è¯»å…¥çš„æ•°æ®çš„å­—èŠ‚æ•°,
+								&BytesRead, // Stores number of bytes read,æŒ‡å‘ä¸€ä¸ªDWORDæ•°å€¼ï¼Œè¯¥æ•°å€¼è¿”å›è¯»æ“ä½œå®é™…è¯»å…¥çš„å­—èŠ‚æ•°
+								&m_ov);     //pointer to the m_ov structureé‡å æ“ä½œæ—¶ï¼Œè¯¥å‚æ•°æŒ‡å‘ä¸€ä¸ªOVERLAPPEDç»“æ„ï¼ŒåŒæ­¥æ“ä½œæ—¶ï¼Œè¯¥å‚æ•°ä¸ºNULL
 			//cout<<RXBuff;
 			RXBuff2Cst.Format(_T("%d"),data,RXBuff);
 			data += RXBuff2Cst;
-			if (!bResult)   //µ±ReadFileºÍWriteFile·µ»ØFALSEÊ±£¬²»Ò»¶¨¾ÍÊÇ²Ù×÷Ê§°Ü£¬Ïß³ÌÓ¦¸Ãµ÷ÓÃGetLastErrorº¯Êı·ÖÎö·µ»ØµÄ½á¹û
+			if (!bResult)   //å½“ReadFileå’ŒWriteFileè¿”å›FALSEæ—¶ï¼Œä¸ä¸€å®šå°±æ˜¯æ“ä½œå¤±è´¥ï¼Œçº¿ç¨‹åº”è¯¥è°ƒç”¨GetLastErrorå‡½æ•°åˆ†æè¿”å›çš„ç»“æœ
 			{
 			switch (dwError =GetLastError())
 				{
@@ -157,7 +157,7 @@ bool MyComm::ReceiveChar()
     }
 }
 
-//Ğ´ÈëÊı¾İ
+//å†™å…¥æ•°æ®
 bool MyComm::WriteChar(BYTE * m_szWriteBuffer,DWORD m_nToSend)
 {
 	
@@ -170,17 +170,17 @@ bool MyComm::WriteChar(BYTE * m_szWriteBuffer,DWORD m_nToSend)
 	{
 		m_ov.Offset = 0;
 		m_ov.OffsetHigh = 0;// Clear buffer
-		bResult=WriteFile(hComm, // Handle toCOMM Port, ´®¿ÚµÄ¾ä±ú
-						m_szWriteBuffer,// Pointer to message buffer in calling finction¼´ÒÔ¸ÃÖ¸ÕëµÄÖµÎªÊ×µØÖ·µÄnNumberOfBytesToWrite¸ö×Ö½ÚµÄÊı¾İ½«ÒªĞ´Èë´®¿ÚµÄ·¢ËÍÊı¾İ»º³åÇø
-						m_nToSend,      // Length of message to send, ÒªĞ´ÈëµÄÊı¾İµÄ×Ö½ÚÊı
-						&BytesSent,     //Where to store the number of bytes sentÖ¸ÏòÖ¸ÏòÒ»¸öDWORDÊıÖµ£¬¸ÃÊıÖµ·µ»ØÊµ¼ÊĞ´ÈëµÄ×Ö½ÚÊı
-						&m_ov );        //Overlapped structureÖØµş²Ù×÷Ê±£¬¸Ã²ÎÊıÖ¸ÏòÒ»¸öOVERLAPPED½á¹¹£¬Í¬²½²Ù×÷Ê±£¬¸Ã²ÎÊıÎªNULL
-		if(!bResult) // µ±ReadFileºÍWriteFile·µ»ØFALSEÊ±£¬²»Ò»¶¨¾ÍÊÇ²Ù×÷Ê§°Ü£¬Ïß³ÌÓ¦¸Ãµ÷ÓÃGetLastErrorº¯Êı·ÖÎö·µ»ØµÄ½á¹û
+		bResult=WriteFile(hComm, // Handle toCOMM Port, ä¸²å£çš„å¥æŸ„
+						m_szWriteBuffer,// Pointer to message buffer in calling finctionå³ä»¥è¯¥æŒ‡é’ˆçš„å€¼ä¸ºé¦–åœ°å€çš„nNumberOfBytesToWriteä¸ªå­—èŠ‚çš„æ•°æ®å°†è¦å†™å…¥ä¸²å£çš„å‘é€æ•°æ®ç¼“å†²åŒº
+						m_nToSend,      // Length of message to send, è¦å†™å…¥çš„æ•°æ®çš„å­—èŠ‚æ•°
+						&BytesSent,     //Where to store the number of bytes sentæŒ‡å‘æŒ‡å‘ä¸€ä¸ªDWORDæ•°å€¼ï¼Œè¯¥æ•°å€¼è¿”å›å®é™…å†™å…¥çš„å­—èŠ‚æ•°
+						&m_ov );        //Overlapped structureé‡å æ“ä½œæ—¶ï¼Œè¯¥å‚æ•°æŒ‡å‘ä¸€ä¸ªOVERLAPPEDç»“æ„ï¼ŒåŒæ­¥æ“ä½œæ—¶ï¼Œè¯¥å‚æ•°ä¸ºNULL
+		if(!bResult) // å½“ReadFileå’ŒWriteFileè¿”å›FALSEæ—¶ï¼Œä¸ä¸€å®šå°±æ˜¯æ“ä½œå¤±è´¥ï¼Œçº¿ç¨‹åº”è¯¥è°ƒç”¨GetLastErrorå‡½æ•°åˆ†æè¿”å›çš„ç»“æœ
 		{
 			DWORD dwError = GetLastError();
 			switch (dwError)
 			{
-				case ERROR_IO_PENDING: //GetLastErrorº¯Êı·µ»ØERROR_IO_PENDING¡£ÕâËµÃ÷ÖØµş²Ù×÷»¹Î´Íê³É
+				case ERROR_IO_PENDING: //GetLastErrorå‡½æ•°è¿”å›ERROR_IO_PENDINGã€‚è¿™è¯´æ˜é‡å æ“ä½œè¿˜æœªå®Œæˆ
 				{
 					// continue to GetOverlappedResults()
 					BytesSent = 0;
@@ -229,25 +229,25 @@ char * MyComm::AutoReadport()
 	DWORD dwSizeofPortName; 
 	DWORD Type;
 	HKEY hKey; 
-	CString strSerialList[256];  // ÁÙÊ±¶¨Òå 256 ¸ö×Ö·û´®×é£¬ÒòÎªÏµÍ³×î¶àÒ²¾Í 256 ¸ö
+	CString strSerialList[256];  // ä¸´æ—¶å®šä¹‰ 256 ä¸ªå­—ç¬¦ä¸²ç»„ï¼Œå› ä¸ºç³»ç»Ÿæœ€å¤šä¹Ÿå°± 256 ä¸ª
 	LPCTSTR data_Set="HARDWARE\\DEVICEMAP\\SERIALCOMM\\";
 	dwName = sizeof(Name); 
 	dwSizeofPortName = sizeof(szPortName);
 	//long ret0 = (::RegOpenKeyEx(HKEY_LOCAL_MACHINE, data_Set, 0, KEY_READ, &hKey)); 
-	long ret0 = RegOpenKeyEx(HKEY_LOCAL_MACHINE, data_Set, 0, KEY_READ, &hKey); //´ò¿ªÒ»¸öÖÆ¶¨µÄ×¢²á±í¼ü,³É¹¦·µ»ØERROR_SUCCESS¼´¡°0¡±Öµ
+	long ret0 = RegOpenKeyEx(HKEY_LOCAL_MACHINE, data_Set, 0, KEY_READ, &hKey); //æ‰“å¼€ä¸€ä¸ªåˆ¶å®šçš„æ³¨å†Œè¡¨é”®,æˆåŠŸè¿”å›ERROR_SUCCESSå³â€œ0â€å€¼
 	if(ret0 == ERROR_SUCCESS) 
 	{
 		do 
 		{
-			Status = RegEnumValue(hKey, dwIndex++, Name, &dwName, NULL, &Type, szPortName, &dwSizeofPortName);//¶ÁÈ¡¼üÖµ 
+			Status = RegEnumValue(hKey, dwIndex++, Name, &dwName, NULL, &Type, szPortName, &dwSizeofPortName);//è¯»å–é”®å€¼ 
 			if((Status == ERROR_SUCCESS)||(Status == ERROR_MORE_DATA)) 
 			{ 
-				strSerialList[i] = CString(szPortName);       // ´®¿Ú×Ö·û´®±£´æ 
+				strSerialList[i] = CString(szPortName);       // ä¸²å£å­—ç¬¦ä¸²ä¿å­˜ 
 				printf("serial:%s\n",strSerialList[i]);
-				i++;// ´®¿Ú¼ÆÊı 
-				//--¿ÉÄÜ³öÏÖ¶à¸ö´®¿Ú£¬ºóÃæ»áĞŞ¸Ä
+				i++;// ä¸²å£è®¡æ•° 
+				//--å¯èƒ½å‡ºç°å¤šä¸ªä¸²å£ï¼Œåé¢ä¼šä¿®æ”¹
 			} 
-			//Ã¿¶ÁÈ¡Ò»´ÎdwNameºÍdwSizeofPortName¶¼»á±»ĞŞ¸Ä 			//×¢ÒâÒ»¶¨ÒªÖØÖÃ,·ñÔò»á³öÏÖºÜÀëÆæµÄ´íÎó,±¾ÈË¾ÍÊÔ¹ıÒòÃ»ÓĞÖØÖÃ,³öÏÖÏÈ²åÈë´®¿ÚºÅ´óµÄ£¨ÈçCOM4£©,ÔÙ²åÈë´®¿ÚºÅĞ¡µÄ£¨ÈçCOM3£©£¬´ËÊ±ËäÄÜ·¢ÏÖÁ½¸ö´®¿Ú£¬µ«¶¼ÊÇÍ¬Ò»´®¿ÚºÅ£¨COM4£©µÄÎÊÌâ£¬Í¬Ê±Ò²¶Á²»ÁËCOM´óÓÚ10ÒÔÉÏµÄ´®¿Ú 
+			//æ¯è¯»å–ä¸€æ¬¡dwNameå’ŒdwSizeofPortNameéƒ½ä¼šè¢«ä¿®æ”¹ 			//æ³¨æ„ä¸€å®šè¦é‡ç½®,å¦åˆ™ä¼šå‡ºç°å¾ˆç¦»å¥‡çš„é”™è¯¯,æœ¬äººå°±è¯•è¿‡å› æ²¡æœ‰é‡ç½®,å‡ºç°å…ˆæ’å…¥ä¸²å£å·å¤§çš„ï¼ˆå¦‚COM4ï¼‰,å†æ’å…¥ä¸²å£å·å°çš„ï¼ˆå¦‚COM3ï¼‰ï¼Œæ­¤æ—¶è™½èƒ½å‘ç°ä¸¤ä¸ªä¸²å£ï¼Œä½†éƒ½æ˜¯åŒä¸€ä¸²å£å·ï¼ˆCOM4ï¼‰çš„é—®é¢˜ï¼ŒåŒæ—¶ä¹Ÿè¯»ä¸äº†COMå¤§äº10ä»¥ä¸Šçš„ä¸²å£ 
 			dwName = sizeof(Name); 
 			dwSizeofPortName = sizeof(szPortName); 
 		} while((Status == ERROR_SUCCESS)||(Status == ERROR_MORE_DATA)); 
@@ -261,11 +261,11 @@ char * MyComm::AutoReadport()
 	return 0;
 }
 
-//×Ô¶¯³õÊ¼»¯
-/*bool MyComm::AutoInit(int m_portRate,  //²¨ÌØÂÊ
-					  int m_parity,    //ÆæÅ¼Ğ£Ñé
-					  int m_stopbit,   //Í£Ö¹Î»
-					  int m_bytesize)  //Êı¾İÎ»
+//è‡ªåŠ¨åˆå§‹åŒ–
+/*bool MyComm::AutoInit(int m_portRate,  //æ³¢ç‰¹ç‡
+					  int m_parity,    //å¥‡å¶æ ¡éªŒ
+					  int m_stopbit,   //åœæ­¢ä½
+					  int m_bytesize)  //æ•°æ®ä½
 {
 	if(openport(AutoReadport())
 		||setupdcb(m_portRate, m_parity, m_stopbit, m_bytesize)
@@ -279,7 +279,7 @@ char * MyComm::AutoReadport()
 	}
 }*/
 
-//²âÊÔÊ¾Àı
+//æµ‹è¯•ç¤ºä¾‹
 /*
 void MyComm::MyCommTsetExample()
 {
@@ -287,13 +287,13 @@ void MyComm::MyCommTsetExample()
 		cout<<"open comport success"<<endl;
 	if(setupdcb(9600))
 		cout<<"setupDCB success"<<endl;
-	if(setuptimeout(0,0,0,0,0)) //Èç¹ûËùÓĞĞ´³¬Ê±²ÎÊı¾ùÎª0£¬ÄÇÃ´¾Í²»Ê¹ÓÃĞ´³¬Ê±
+	if(setuptimeout(0,0,0,0,0)) //å¦‚æœæ‰€æœ‰å†™è¶…æ—¶å‚æ•°å‡ä¸º0ï¼Œé‚£ä¹ˆå°±ä¸ä½¿ç”¨å†™è¶…æ—¶
 		cout<<"setuptimeout success"<<endl;
-	PurgeComm(hComm, PURGE_RXCLEAR | PURGE_TXCLEAR | PURGE_RXABORT |PURGE_TXABORT); // ÔÚ¶ÁĞ´´®¿ÚÖ®Ç°£¬»¹ÒªÓÃPurgeComm()º¯ÊıÇå¿Õ»º³åÇø
-		//PURGE_TXABORT   ÖĞ¶ÏËùÓĞĞ´²Ù×÷²¢Á¢¼´·µ»Ø£¬¼´Ê¹Ğ´²Ù×÷»¹Ã»ÓĞÍê³É¡£
-		//PURGE_RXABORT   ÖĞ¶ÏËùÓĞ¶Á²Ù×÷²¢Á¢¼´·µ»Ø£¬¼´Ê¹¶Á²Ù×÷»¹Ã»ÓĞÍê³É¡£
-		//PURGE_TXCLEAR   Çå³ıÊä³ö»º³åÇø
-		//PURGE_RXCLEAR   Çå³ıÊäÈë»º³åÇø
+	PurgeComm(hComm, PURGE_RXCLEAR | PURGE_TXCLEAR | PURGE_RXABORT |PURGE_TXABORT); // åœ¨è¯»å†™ä¸²å£ä¹‹å‰ï¼Œè¿˜è¦ç”¨PurgeComm()å‡½æ•°æ¸…ç©ºç¼“å†²åŒº
+		//PURGE_TXABORT   ä¸­æ–­æ‰€æœ‰å†™æ“ä½œå¹¶ç«‹å³è¿”å›ï¼Œå³ä½¿å†™æ“ä½œè¿˜æ²¡æœ‰å®Œæˆã€‚
+		//PURGE_RXABORT   ä¸­æ–­æ‰€æœ‰è¯»æ“ä½œå¹¶ç«‹å³è¿”å›ï¼Œå³ä½¿è¯»æ“ä½œè¿˜æ²¡æœ‰å®Œæˆã€‚
+		//PURGE_TXCLEAR   æ¸…é™¤è¾“å‡ºç¼“å†²åŒº
+		//PURGE_RXCLEAR   æ¸…é™¤è¾“å…¥ç¼“å†²åŒº
 	WriteChar((unsigned char*)"please send data now",20);
 	cout<<"received data:"<<endl;
 	ReceiveChar();
